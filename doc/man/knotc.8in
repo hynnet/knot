@@ -78,6 +78,9 @@ Stop the server if running.
 Reload the server configuration and modified zone files. All open zone
 transactions will be aborted!
 .TP
+\fBstats\fP [\fImodule\fP[\fB\&.\fP\fImetrics\fP]]
+Show global statistics.
+.TP
 \fBzone\-check\fP [\fIzone\fP\&...]
 Test if the server can load the zone. Semantic checks are executed if enabled
 in the configuration. (*)
@@ -137,6 +140,9 @@ Remove zone data within the transaction.
 \fBzone\-purge\fP \fIzone\fP\&...
 Purge zone data, file, journal, and timers.
 .TP
+\fBzone\-stats\fP \fIzone\fP [\fImodule\fP[\fB\&.\fP\fImetrics\fP]]
+Show zone statistics.
+.TP
 \fBconf\-init\fP
 Initialize the configuration database. (*)
 .TP
@@ -177,6 +183,13 @@ Set the item data in the transaction.
 .TP
 \fBconf\-unset\fP [\fIitem\fP] [\fIdata\fP\&...]
 Unset the item data in the transaction.
+.TP
+\fBstats\fP [\fIsection\fP] [\fIcounter\fP]
+Show current state of global query statistics. Section limits shown statistics to group of counters. Query can have only one of these group counters.
+Counter limits output to one item. If counter has 0 value, force flag has to be set for the counter to be printed.
+.TP
+\fBzone\-stats\fP \fIzone\fP [\fIsection\fP] [\fIcounter\fP]
+\fBstats\fP for per zone statistics. \fI\-\-\fP to get statistics for all zones.
 .UNINDENT
 .SS Note
 .sp

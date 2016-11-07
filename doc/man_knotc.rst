@@ -55,6 +55,9 @@ Actions
   Reload the server configuration and modified zone files. All open zone
   transactions will be aborted!
 
+**stats** [*module*\ [\ **.**\ *metrics*\ ]]
+  Show global statistics.
+
 **zone-check** [*zone*...]
   Test if the server can load the zone. Semantic checks are executed if enabled
   in the configuration. (*)
@@ -114,6 +117,9 @@ Actions
 **zone-purge** *zone*...
   Purge zone data, file, journal, and timers.
 
+**zone-stats** *zone* [*module*\ [\ **.**\ *metrics*\ ]]
+  Show zone statistics.
+
 **conf-init**
   Initialize the configuration database. (*)
 
@@ -154,6 +160,13 @@ Actions
 
 **conf-unset** [*item*] [*data*...]
   Unset the item data in the transaction.
+
+**stats** [*section*] [*counter*]
+  Show current state of global query statistics. Section limits shown statistics to group of counters. Query can have only one of these group counters. 
+  Counter limits output to one item. If counter has 0 value, force flag has to be set for the counter to be printed.
+
+**zone-stats** *zone* [*section*] [*counter*]
+  **stats** for per zone statistics. *--* to get statistics for all zones.
 
 Note
 ....

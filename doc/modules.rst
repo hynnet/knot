@@ -515,3 +515,30 @@ to the configuration file::
 
 .. NOTE::
    This module is not configurable.
+
+.. _mod-stats:
+
+``stats`` — query statistics
+----------------------------
+
+The module meassures incoming DNS query and corresponding response parameters.
+This includes:
+
+* The number of queries over UDP4, TCP4, UDP6, and TCP6.
+* Total number of query bytes (excluding DDNS).
+* Total number of response bytes (excluding XFR).
+* Total number of DDNS query bytes.
+* Total number of XFR response bytes.
+* The number of queries by OpCode. The modulu distinguishes Query, Notify, Update,
+  AXFR, and IXFR.
+* The number of queries by RCODE + NODATA pseudo-RCODE.
+* The number of queries by QTYPE.
+* The query and response size distribution by 16-byte size range (based on
+  RSSAC Advisory on Measurements of the Root Server System)
+
+If a metrics value is out of supported range/type, it is counted as "Unknown".
+
+.. NOTE::
+   Server initiated communication (outgoing NOTIFY, incoming \*XFR,...) is not
+   meassured by this module.
+
