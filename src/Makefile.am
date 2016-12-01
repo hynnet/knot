@@ -325,12 +325,12 @@ libknotd_la_SOURCES =				\
 	knot/common/ref.h			\
 	knot/server/dthreads.c			\
 	knot/server/dthreads.h			\
-	knot/server/journal.c			\
-	knot/server/journal.h			\
+	knot/journal/journal.c			\
+	knot/journal/journal.h			\
 	knot/server/rrl.c			\
 	knot/server/rrl.h			\
-	knot/server/serialization.c		\
-	knot/server/serialization.h		\
+	knot/journal/serialization.c		\
+	knot/journal/serialization.h		\
 	knot/server/server.c			\
 	knot/server/server.h			\
 	knot/server/tcp-handler.c		\
