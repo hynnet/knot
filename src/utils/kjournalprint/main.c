@@ -36,7 +36,9 @@ static void print_help(void)
 	       "\n"
 	       "Parameters:\n"
 	       " -n, --no-color       Get output without terminal coloring.\n"
-	       " -l, --limit <Limit>  Read only x newest changes.\n",
+	       " -l, --limit <Limit>  Read only x newest changes.\n"
+	       " -t, --list-zones     Instead of reading jurnal, display the list\n"
+	       "                      of zones in the DB (<zone_name> not needed)\n",
 	       PROGRAM_NAME);
 }
 
@@ -132,22 +134,50 @@ pj_finally:
 	return ret;
 }
 
+int list_zones(char * path)
+{
+	journal_db_t * jdb = NULL;
+	int ret = init_journal_db(&jdb, path, KNOT_JOURNAL_FSLIMIT_SAMEASLAST);
+	if (ret != KNOT_EOK) {
+		return ret;
+	}
+
+	list_t zones;
+	init_list(&zones);
+	ret = journal_db_list_zones(&jdb, &zones);
+	if (ret == KNOT_EOK) {
+		ptrnode_t * zn;
+		WALK_LIST(zn, zones) {
+			printf("%s\n", (char *)zn->d);
+		}
+		ptrlist_free(&zones, NULL);
+	}
+
+	close_journal_db(&jdb);
+	return ret;
+}
+
+
 int main(int argc, char *argv[])
 {
 	uint32_t limit = 0;
-	bool color = true;
+	bool color = true, justlist = false;
 
 	struct option opts[] = {
-		{ "limit",    required_argument, NULL, 'l' },
-		{ "no-color", no_argument,       NULL, 'n' },
-		{ "help",     no_argument,       NULL, 'h' },
-		{ "version",  no_argument,       NULL, 'V' },
+		{ "list-zones", no_argument,       NULL, 't' },
+		{ "limit",      required_argument, NULL, 'l' },
+		{ "no-color",   no_argument,       NULL, 'n' },
+		{ "help",       no_argument,       NULL, 'h' },
+		{ "version",    no_argument,       NULL, 'V' },
 		{ NULL }
 	};
 
 	int opt = 0;
-	while ((opt = getopt_long(argc, argv, "l:nhV", opts, NULL)) != -1) {
+	while ((opt = getopt_long(argc, argv, "tl:nhV", opts, NULL)) != -1) {
 		switch (opt) {
+		case 't':
+			justlist = true;
+			break;
 		case 'l':
 			if (str_to_u32(optarg, &limit) != KNOT_EOK) {
 				print_help();
@@ -188,6 +218,24 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "Journal file not specified\n");
 		return EXIT_FAILURE;
 	}
+
+	if (justlist) {
+		int ret = list_zones(db);
+		switch (ret) {
+		case KNOT_ENOENT:
+			printf("No zones in journal DB.\n");
+			// FALLTHROUGH
+		case KNOT_EOK:
+			return EXIT_SUCCESS;
+		case KNOT_EMALF:
+			fprintf(stderr, "The journal DB is broken.\n");
+			return EXIT_FAILURE;
+		default:
+			fprintf(stderr, "Failed to load zone list (%s).\n", knot_strerror(ret));
+			return EXIT_FAILURE;
+		}
+	}
+
 	if (name == NULL) {
 		fprintf(stderr, "Zone not specified\n");
 		return EXIT_FAILURE;
