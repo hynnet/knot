@@ -482,7 +482,7 @@ int check_template(
 
 	// Check journal.
 	conf_val_t journal = conf_rawid_get_txn(args->conf, args->txn, C_TPL,
-	                                        C_JOURNAL, args->id, args->id_len);
+	                                        C_JOURNAL_DB, args->id, args->id_len);
 
 	if (journal.code == KNOT_EOK) {
 		args->err_str = "journal location in non-default template";
@@ -491,7 +491,7 @@ int check_template(
 
 	// Check max-journal-size.
 	conf_val_t max_journal_size = conf_rawid_get_txn(args->conf, args->txn, C_TPL,
-	                                                 C_MAX_JOURNAL_SIZE, args->id, args->id_len);
+	                                                 C_MAX_JOURNAL_DB_SIZE, args->id, args->id_len);
 
 	if (max_journal_size.code == KNOT_EOK) {
 		args->err_str = "journal size in non-default template";

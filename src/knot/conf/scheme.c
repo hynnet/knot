@@ -233,6 +233,9 @@ static const yp_item_t desc_remote[] = {
 	{ C_DISABLE_ANY,         YP_TBOOL, YP_VNONE }, \
 	{ C_ZONEFILE_SYNC,       YP_TINT,  YP_VINT = { -1, INT32_MAX, 0, YP_STIME } }, \
 	{ C_IXFR_DIFF,           YP_TBOOL, YP_VNONE }, \
+	{ C_JOURNAL,             YP_TSTR,  YP_VNONE, FLAGS }, /* obsolete, old journal compat */ \
+	{ C_MAX_JOURNAL_SIZE,    YP_TINT,  YP_VINT = { 0, INT64_MAX, INT64_MAX, YP_SSIZE }, \
+				   FLAGS }, /* obsolete, old journal compat */ \
 	{ C_MAX_ZONE_SIZE,       YP_TINT,  YP_VINT = { 0, INT64_MAX, INT64_MAX, YP_SSIZE }, \
 	                                   FLAGS }, \
 	{ C_MAX_JOURNAL_USAGE,   YP_TINT,  YP_VINT = { 40 * 1024, INT64_MAX, 100 * 1024 * 1024, \
@@ -253,8 +256,8 @@ static const yp_item_t desc_template[] = {
 	{ C_TIMER_DB,            YP_TSTR,  YP_VSTR = { "timers" }, CONF_IO_FRLD_ZONES }, \
 	{ C_GLOBAL_MODULE,       YP_TDATA, YP_VDATA = { 0, NULL, mod_id_to_bin, mod_id_to_txt }, \
 	                                   YP_FMULTI | CONF_IO_FRLD_MOD, { check_modref } }, \
-	{ C_JOURNAL,             YP_TSTR,  YP_VSTR = { "journal.db" }, CONF_IO_FRLD_SRV }, \
-	{ C_MAX_JOURNAL_SIZE,    YP_TINT,  YP_VINT = { 1024 * 1024, VIRT_MEM_LIMIT(100 * TERA), \
+	{ C_JOURNAL_DB,          YP_TSTR,  YP_VSTR = { "journal" }, CONF_IO_FRLD_SRV }, \
+	{ C_MAX_JOURNAL_DB_SIZE, YP_TINT,  YP_VINT = { 1024 * 1024, VIRT_MEM_LIMIT(100 * TERA), \
 	                                               VIRT_MEM_LIMIT(20 * GIGA), YP_SSIZE }, \
 	                                               CONF_IO_FRLD_SRV }, \
 	{ NULL }

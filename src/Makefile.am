@@ -327,6 +327,8 @@ libknotd_la_SOURCES =				\
 	knot/server/dthreads.h			\
 	knot/journal/journal.c			\
 	knot/journal/journal.h			\
+	knot/journal/old_journal.c		\
+	knot/journal/old_journal.h		\
 	knot/server/rrl.c			\
 	knot/server/rrl.h			\
 	knot/journal/serialization.c		\

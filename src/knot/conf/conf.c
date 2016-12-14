@@ -1046,6 +1046,27 @@ char* conf_zonefile_txn(
 	return get_filename(conf, txn, zone, file);
 }
 
+char* conf_old_journalfile(conf_t *conf,
+	const knot_dname_t *zone, bool *is_configured)
+{
+	*is_configured = true;
+
+	if (zone == NULL) {
+		return NULL;
+	}
+
+	conf_val_t val = conf_zone_get(conf, C_JOURNAL, zone);
+	const char *journal = conf_str(&val);
+
+	// Use default journalfile name pattern if not specified.
+	if (journal == NULL) {
+		journal = "%s.db";
+		*is_configured = false;
+	}
+
+	return get_filename(conf, &conf->read_txn, zone, journal);
+}
+
 char* conf_journalfile_txn(
 	conf_t *conf,
 	knot_db_txn_t *txn)
@@ -1055,7 +1076,8 @@ char* conf_journalfile_txn(
 	val = conf_default_get_txn(conf, txn, C_STORAGE);
 	char *storage = conf_abs_path(&val, NULL);
 
-	val = conf_default_get_txn(conf, txn, C_JOURNAL);
+	val = conf_default_get_txn(conf, txn, C_JOURNAL_DB);
+	assert(conf_str(&val) != NULL);
 
 	char *journaldir = conf_abs_path(&val, storage);
 	free(storage);
