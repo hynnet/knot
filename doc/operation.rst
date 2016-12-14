@@ -266,3 +266,32 @@ no differences will be created.
 If you want to refresh the slave zones, you can do this with::
 
     $ knotc zone-refresh
+
+Journal behaviour
+=================
+
+Zone journal keeps some history of changes of the zone. It is useful for
+responding IXFR queries. Also if zonefile-sync == -1 (zone file flush disabled),
+journal keeps diff between zonefile and zone for the case of server shutdown.
+The history is stored by changesets - diffs of zone contents between two
+(usually subsequent) zone serials.
+
+Journals for all zones are stored in common LMDB database. Huge changesets are
+split into 60 KiB (this constant is hardcoded) blocks to prevent fragmentation of the DB.
+Journal does each operation in one transaction to keep consistency of the DB and performance.
+The exception is when store transaction exceeds 5% of the whole DB mapsize, it is split into multiple ones
+and some dirty-chunks-management involves.
+
+Each zone journal has own
+usage limit on how much DB space it may occupy. Before hitting the limit,
+changesets are stored one-by-one and whole history is linear. While hitting the limit,
+the zone is flushed into zone file, and oldest changesets are deleted as needed to free
+some space. Actually, twice (again, hardcoded constant) the needed amount is deleted to
+prevent too frequent deletes. Further zone file flush is invoked after the journal runs out of deletable
+"flushed changesets".
+
+If zone file flush is disabled, instead of flushing the zone, the journal tries to
+save space by merging older changesets into one. It works well if the changes rewrite
+each other, e.g. periodically changing few zone records, re-signing whole zone...
+The diff between zone file and zone is thus preserved, even if journal deletes some
+older changesets.
