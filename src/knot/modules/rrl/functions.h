@@ -1,4 +1,4 @@
-/*  Copyright (C) 2011 CZ.NIC, z.s.p.o. <knot-dns@labs.nic.cz>
+/*  Copyright (C) 2016 CZ.NIC, z.s.p.o. <knot-dns@labs.nic.cz>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -13,16 +13,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/*!
- * \file rrl.h
- *
- * \author Marek Vavrusa <marek.vavusa@nic.cz>
- *
- * \brief Response-rate limiting API.
- *
- * \addtogroup network
- * @{
- */
 
 #pragma once
 
@@ -30,6 +20,8 @@
 #include <pthread.h>
 #include <sys/socket.h>
 #include "libknot/packet/pkt.h"
+
+struct zone;
 
 /* Defaults */
 #define RRL_SLIP_MAX 100
@@ -40,8 +32,6 @@ enum {
 	RRL_NOFLAG    = 0 << 0, /*!< No flags. */
 	RRL_WILDCARD  = 1 << 1  /*!< Query to wildcard name. */
 };
-
-struct zone;
 
 /*!
  * \brief RRL hash bucket.
@@ -72,7 +62,7 @@ typedef struct rrl_table {
 	uint32_t rate;       /* Configured RRL limit */
 	uint32_t seed;       /* Pseudorandom seed for hashing. */
 	pthread_mutex_t ll;
-	pthread_mutex_t *lk;      /* Table locks. */
+	pthread_mutex_t *lk; /* Table locks. */
 	unsigned lk_count;   /* Table lock count (granularity). */
 	size_t size;         /* Number of buckets */
 	rrl_item_t arr[];    /* Buckets */
@@ -133,8 +123,8 @@ int rrl_setlocks(rrl_table_t *rrl, unsigned granularity);
  * \param lock Held lock.
  * \return assigned bucket
  */
-rrl_item_t* rrl_hash(rrl_table_t *t, const struct sockaddr_storage *a, rrl_req_t *p,
-                     const struct zone *zone, uint32_t stamp, int* lock);
+rrl_item_t *rrl_hash(rrl_table_t *t, const struct sockaddr_storage *a, rrl_req_t *p,
+                     const struct zone *zone, uint32_t stamp, int *lock);
 
 /*!
  * \brief Query the RRL table for accept or deny, when the rate limit is reached.

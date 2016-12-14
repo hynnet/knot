@@ -1,4 +1,4 @@
-/*  Copyright (C) 2011 CZ.NIC, z.s.p.o. <knot-dns@labs.nic.cz>
+/*  Copyright (C) 2016 CZ.NIC, z.s.p.o. <knot-dns@labs.nic.cz>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,13 +17,13 @@
 #include <assert.h>
 #include <time.h>
 
-#include "dnssec/random.h"
-#include "knot/common/log.h"
-#include "knot/server/rrl.h"
-#include "knot/zone/zone.h"
 #include "libknot/libknot.h"
 #include "contrib/murmurhash3/murmurhash3.h"
 #include "contrib/sockaddr.h"
+#include "dnssec/random.h"
+#include "knot/modules/rrl/functions.h"
+#include "knot/common/log.h"
+#include "knot/zone/zone.h"
 
 /* Hopscotch defines. */
 #define HOP_LEN (sizeof(unsigned)*8)
@@ -33,7 +33,6 @@
 #define RRL_V4_PREFIX ((uint32_t)0x00ffffff)         /* /24 */
 #define RRL_V6_PREFIX ((uint64_t)0x00ffffffffffffff) /* /56 */
 /* Defaults */
-#define RRL_DEFAULT_RATE 100
 #define RRL_CAPACITY 4 /* N seconds. */
 #define RRL_SSTART 2 /* 1/Nth of the rate for slow start */
 #define RRL_PSIZE_LARGE 1024
@@ -60,16 +59,16 @@ struct cls_name {
 };
 
 static const struct cls_name rrl_cls_names[] = {
-        {CLS_NORMAL,  "POSITIVE" },
-        {CLS_ERROR,   "ERROR" },
-        {CLS_NXDOMAIN,"NXDOMAIN"},
-        {CLS_EMPTY,   "EMPTY"},
-        {CLS_LARGE,   "LARGE"},
-        {CLS_WILDCARD,"WILDCARD"},
-        {CLS_ANY,     "ANY"},
-        {CLS_DNSSEC,  "DNSSEC"},
-        {CLS_NULL,    "NULL"},
-        {CLS_NULL,    NULL}
+	{ CLS_NORMAL,   "POSITIVE" },
+	{ CLS_ERROR,    "ERROR" },
+	{ CLS_NXDOMAIN, "NXDOMAIN"},
+	{ CLS_EMPTY,    "EMPTY"},
+	{ CLS_LARGE,    "LARGE"},
+	{ CLS_WILDCARD, "WILDCARD"},
+	{ CLS_ANY,      "ANY"},
+	{ CLS_DNSSEC,   "DNSSEC"},
+	{ CLS_NULL,     "NULL"},
+	{ CLS_NULL,     NULL}
 };
 
 static inline const char *rrl_clsstr(int code)

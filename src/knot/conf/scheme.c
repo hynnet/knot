@@ -23,12 +23,12 @@
 #include "knot/conf/confio.h"
 #include "knot/conf/tools.h"
 #include "knot/common/log.h"
-#include "knot/server/rrl.h"
 #include "knot/updates/acl.h"
 #include "libknot/rrtype/opt.h"
 #include "dnssec/lib/dnssec/tsig.h"
 #include "dnssec/lib/dnssec/key.h"
 
+#include "knot/modules/rrl/rrl.h"
 #include "knot/modules/stats/stats.h"
 #include "knot/modules/synth_record/synth_record.h"
 #include "knot/modules/dnsproxy/dnsproxy.h"
@@ -123,8 +123,8 @@ static const yp_item_t desc_server[] = {
 	                                                KNOT_EDNS_MAX_UDP_PAYLOAD,
 	                                                4096, YP_SSIZE } },
 	{ C_RATE_LIMIT,           YP_TINT,  YP_VINT = { 0, INT32_MAX, 0 } },
-	{ C_RATE_LIMIT_SLIP,      YP_TINT,  YP_VINT = { 0, RRL_SLIP_MAX, 1 } },
-	{ C_RATE_LIMIT_TBL_SIZE,  YP_TINT,  YP_VINT = { 1, INT32_MAX, 393241 } },
+	{ C_RATE_LIMIT_SLIP,      YP_TINT,  YP_VINT = { 0, INT32_MAX, 0 } },
+	{ C_RATE_LIMIT_TBL_SIZE,  YP_TINT,  YP_VINT = { 1, INT32_MAX, 0 } },
 	{ C_RATE_LIMIT_WHITELIST, YP_TDATA, YP_VDATA = { 0, NULL, addr_range_to_bin,
 	                                                 addr_range_to_txt }, YP_FMULTI },
 	{ C_LISTEN,               YP_TADDR, YP_VADDR = { 53 }, YP_FMULTI },
@@ -276,6 +276,8 @@ const yp_item_t conf_scheme[] = {
 	{ C_ACL,      YP_TGRP, YP_VGRP = { desc_acl }, YP_FMULTI, { check_acl } },
 	{ C_RMT,      YP_TGRP, YP_VGRP = { desc_remote }, YP_FMULTI, { check_remote } },
 /* MODULES */
+	{ C_MOD_RRL,          YP_TGRP, YP_VGRP = { scheme_mod_rrl }, FMOD,
+	                                         { check_mod_rrl } },
 	{ C_MOD_STATS,        YP_TGRP, YP_VGRP = { scheme_mod_stats }, FMOD },
 	{ C_MOD_SYNTH_RECORD, YP_TGRP, YP_VGRP = { scheme_mod_synth_record }, FMOD,
 	                               { check_mod_synth_record } },

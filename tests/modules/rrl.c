@@ -1,4 +1,4 @@
-/*  Copyright (C) 2011 CZ.NIC, z.s.p.o. <knot-dns@labs.nic.cz>
+/*  Copyright (C) 2016 CZ.NIC, z.s.p.o. <knot-dns@labs.nic.cz>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -14,17 +14,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <tap/basic.h>
 
 #include "dnssec/crypto.h"
 #include "dnssec/random.h"
-#include "knot/conf/conf.h"
-#include "knot/server/rrl.h"
-#include "knot/zone/zone.h"
-#include "libknot/descriptor.h"
+#include "libknot/libknot.h"
 #include "contrib/sockaddr.h"
+#include "knot/modules/rrl/functions.h"
+#include "knot/zone/zone.h"
 
 /* Enable time-dependent tests. */
 //#define ENABLE_TIMED_TESTS
@@ -55,7 +52,7 @@ struct runnable_data {
 
 static void* rrl_runnable(void *arg)
 {
-	struct runnable_data* d = (struct runnable_data*)arg;
+	struct runnable_data *d = (struct runnable_data *)arg;
 	struct sockaddr_storage addr;
 	memcpy(&addr, d->addr, sizeof(struct sockaddr_storage));
 	int lock = -1;

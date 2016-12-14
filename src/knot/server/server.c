@@ -399,9 +399,6 @@ void server_deinit(server_t *server)
 	/* Free threads and event handlers. */
 	worker_pool_destroy(server->workers);
 
-	/* Free rate limits. */
-	rrl_destroy(server->rrl);
-
 	/* Free zone database. */
 	knot_zonedb_deep_free(&server->zone_db);
 
@@ -656,39 +653,6 @@ static int reconfigure_threads(conf_t *conf, server_t *server)
 	return reset_handler(server, IO_TCP, conf_tcp_threads(conf), tcp_master);
 }
 
-static int reconfigure_rate_limits(conf_t *conf, server_t *server)
-{
-	conf_val_t val = conf_get(conf, C_SRV, C_RATE_LIMIT);
-	int64_t rrl = conf_int(&val);
-
-	/* Rate limiting. */
-	if (!server->rrl && rrl > 0) {
-		val = conf_get(conf, C_SRV, C_RATE_LIMIT_TBL_SIZE);
-		server->rrl = rrl_create(conf_int(&val));
-		if (!server->rrl) {
-			log_error("failed to initialize rate limiting table");
-		} else {
-			rrl_setlocks(server->rrl, RRL_LOCK_GRANULARITY);
-		}
-	}
-	if (server->rrl) {
-		if (rrl_rate(server->rrl) != rrl) {
-			/* We cannot free it, threads may use it.
-			 * Setting it to <1 will disable rate limiting. */
-			if (rrl < 1) {
-				log_info("rate limiting, disabled");
-			} else {
-				log_info("rate limiting, enabled with %i responses/second",
-					 (int)rrl);
-			}
-			rrl_setrate(server->rrl, rrl);
-
-		} /* At this point, old buckets will converge to new rate. */
-	}
-
-	return KNOT_EOK;
-}
-
 void server_reconfigure(conf_t *conf, server_t *server)
 {
 	if (conf == NULL || server == NULL) {
@@ -700,14 +664,8 @@ void server_reconfigure(conf_t *conf, server_t *server)
 		log_info("Knot DNS %s starting", PACKAGE_VERSION);
 	}
 
-	/* Reconfigure rate limits. */
-	int ret;
-	if ((ret = reconfigure_rate_limits(conf, server)) < 0) {
-		log_error("failed to reconfigure rate limits (%s)",
-		          knot_strerror(ret));
-	}
-
 	/* Reconfigure server threads. */
+	int ret;
 	if ((ret = reconfigure_threads(conf, server)) < 0) {
 		log_error("failed to reconfigure server threads (%s)",
 		          knot_strerror(ret));

@@ -280,6 +280,10 @@ libknotd_la_SOURCES =				\
 	knot/modules/online_sign/online_sign.h	\
 	knot/modules/online_sign/nsec_next.c	\
 	knot/modules/online_sign/nsec_next.h	\
+	knot/modules/rrl/functions.c		\
+	knot/modules/rrl/functions.h		\
+	knot/modules/rrl/rrl.c			\
+	knot/modules/rrl/rrl.h			\
 	knot/modules/stats/stats.c		\
 	knot/modules/stats/stats.h		\
 	knot/modules/synth_record/synth_record.c\
@@ -331,8 +335,6 @@ libknotd_la_SOURCES =				\
 	knot/server/dthreads.h			\
 	knot/server/journal.c			\
 	knot/server/journal.h			\
-	knot/server/rrl.c			\
-	knot/server/rrl.h			\
 	knot/server/serialization.c		\
 	knot/server/serialization.h		\
 	knot/server/server.c			\
