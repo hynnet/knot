@@ -542,7 +542,7 @@ static int online_sign_ctx_new(online_sign_ctx_t **ctx_ptr,
 
 static char *conf_kasp_path(const knot_dname_t *zone)
 {
-	conf_val_t val = { 0 };
+	conf_val_t val;
 
 	val = conf_zone_get(conf(), C_STORAGE, zone);
 	char *storage = conf_abs_path(&val, NULL);
@@ -556,7 +556,6 @@ static char *conf_kasp_path(const knot_dname_t *zone)
 int online_sign_load(struct query_plan *plan, struct query_module *module,
                      const knot_dname_t *zone)
 {
-	assert(plan);
 	assert(module);
 	assert(zone);
 

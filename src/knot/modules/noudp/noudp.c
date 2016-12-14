@@ -28,6 +28,8 @@ static bool is_udp(struct query_data *qdata)
 
 int noudp_begin(int state, knot_pkt_t *pkt, struct query_data *qdata, void *ctx)
 {
+	assert(pkt && qdata);
+
 	if (is_udp(qdata)) {
 		knot_wire_set_tc(pkt->wire);
 		return KNOT_STATE_DONE;

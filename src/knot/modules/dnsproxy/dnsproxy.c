@@ -54,9 +54,7 @@ struct dnsproxy {
 
 static int dnsproxy_fwd(int state, knot_pkt_t *pkt, struct query_data *qdata, void *ctx)
 {
-	if (pkt == NULL || qdata == NULL || ctx == NULL) {
-		return KNOT_STATE_FAIL;
-	}
+	assert(pkt && qdata && ctx);
 
 	/* Forward only queries ending with REFUSED (no zone) or NXDOMAIN (if configured) */
 	struct dnsproxy *proxy = ctx;
@@ -106,9 +104,7 @@ static int dnsproxy_fwd(int state, knot_pkt_t *pkt, struct query_data *qdata, vo
 int dnsproxy_load(struct query_plan *plan, struct query_module *self,
                   const knot_dname_t *zone)
 {
-	if (plan == NULL || self == NULL) {
-		return KNOT_EINVAL;
-	}
+	assert(self);
 
 	struct dnsproxy *proxy = mm_alloc(self->mm, sizeof(struct dnsproxy));
 	if (proxy == NULL) {
