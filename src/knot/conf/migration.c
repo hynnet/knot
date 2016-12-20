@@ -17,24 +17,12 @@
 #include "knot/conf/migration.h"
 #include "knot/conf/confdb.h"
 
-int conf_migrate(
+static int migrate_rrl(
 	conf_t *conf)
 {
-	if (conf == NULL) {
-		return KNOT_EINVAL;
-	}
-
-	int ret;
-
-	knot_db_txn_t txn;
-	ret = conf->api->txn_begin(conf->db, &txn, 0);
-	if (ret != KNOT_EOK) {
-		goto migrate_error;
-	}
-
 	conf_val_t val;
-	ret = conf_db_get(conf, &txn, C_SRV, C_RATE_LIMIT, NULL, 0, &val);
-	if (ret != KNOT_EOK) {
+	int ret = conf_db_get(conf, &txn, C_SRV, C_RATE_LIMIT, NULL, 0, &val);
+	if (ret != KNOT_ENOENT) {
 		conf->api->txn_abort(&txn);
 		goto migrate_error;
 	}
@@ -60,16 +48,27 @@ int conf_migrate(
 		              NULL, 0, true);
 	}
 
-	// Commit new configuration.
-	ret = conf->api->txn_commit(&txn);
-	if (ret != KNOT_EOK) {
-		goto migrate_error;
+}
+
+int conf_migrate(
+	conf_t *conf)
+{
+	if (conf == NULL) {
+		return KNOT_EINVAL;
 	}
 
-	ret = conf_refresh_txn(conf);
+	knot_db_txn_t txn;
+	int ret = conf->api->txn_begin(conf->db, &txn, 0);
+	if (ret != KNOT_EOK) {
+		return ret;
+	}
 
-	ret = KNOT_EOK;
-migrate_error:
+//	if (migrate_rrl(conf) )
 
-	return ret;
+	ret = conf->api->txn_commit(&txn);
+	if (ret != KNOT_EOK) {
+		return ret;
+	}
+
+	return conf_refresh_txn(conf);
 }
