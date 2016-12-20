@@ -19,7 +19,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <inttypes.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <assert.h>
@@ -29,17 +28,15 @@
 #include "knot/journal/old_journal.h"
 #include "knot/journal/serialization.h"
 #include "libknot/libknot.h"
-#include "libknot/rrtype/soa.h"
 
-typedef enum journal_flag_t {
+typedef enum {
 	JOURNAL_NULL  = 0 << 0, /*!< Invalid journal entry. */
 	JOURNAL_FREE  = 1 << 0, /*!< Free journal entry. */
 	JOURNAL_VALID = 1 << 1, /*!< Valid journal entry. */
 	JOURNAL_DIRTY = 1 << 2  /*!< Journal entry cannot be evicted. */
 } journal_flag_t;
 
-typedef struct journal_node
-{
+typedef struct {
 	uint64_t id;    /*!< Node ID. */
 	uint16_t flags; /*!< Node flags. */
 	uint16_t next;  /*!< UNUSED */
@@ -47,8 +44,7 @@ typedef struct journal_node
 	uint32_t len;   /*!< Entry data length. */
 } journal_node_t;
 
-typedef struct journal
-{
+typedef struct {
 	int fd;
 	char *path;             /*!< Path to journal file. */
 	uint16_t tmark;         /*!< Transaction start mark. */
@@ -426,7 +422,8 @@ finish:
 	return ret;
 }
 
-static int load_changeset(old_journal_t *journal, journal_node_t *n, const knot_dname_t *zone, list_t *chgs)
+static int load_changeset(old_journal_t *journal, journal_node_t *n,
+                          const knot_dname_t *zone, list_t *chgs)
 {
 	changeset_t *ch = changeset_new(zone);
 	if (ch == NULL) {
@@ -454,8 +451,8 @@ static int load_changeset(old_journal_t *journal, journal_node_t *n, const knot_
 	return KNOT_EOK;
 }
 
-int old_journal_load_changesets(const char *path, const knot_dname_t *zone, list_t *dst,
-                            uint32_t from, uint32_t to)
+int old_journal_load_changesets(const char *path, const knot_dname_t *zone,
+                                list_t *dst, uint32_t from, uint32_t to)
 {
 	int ret = old_journal_walk(path, from, to, &load_changeset, zone, dst);
 	if (ret != KNOT_EOK) {

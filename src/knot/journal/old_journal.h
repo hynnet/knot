@@ -13,24 +13,12 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/*!
- * \file old_journal.h
- *
- * \author Libor Peltan <libor.peltan@nic.cz>
- *
- * \brief Compatibility library for loading obsolete journal format.
- *
- * \addtogroup utils
- * @{
- */
 
 #pragma once
 
 #include <stdint.h>
-#include <fcntl.h>
-#include <pthread.h>
-#include <stdbool.h>
-#include "knot/updates/changesets.h"
+
+#include "contrib/ucw/lists.h"
 
 /*!
  * \brief Check if the journal file is used or not.
@@ -54,7 +42,5 @@ bool old_journal_exists(const char *path);
  * \retval KNOT_ERANGE if given entry was not found.
  * \return < KNOT_EOK on error.
  */
-int old_journal_load_changesets(const char *path, const knot_dname_t *zone, list_t *dst,
-                            uint32_t from, uint32_t to);
-
-/*! @} */
+int old_journal_load_changesets(const char *path, const knot_dname_t *zone,
+                                list_t *dst, uint32_t from, uint32_t to);
